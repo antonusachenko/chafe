@@ -5,11 +5,11 @@ using UnityStandardAssets.Characters.ThirdPerson;
 public class PlayerController : MonoBehaviour
 {
 
-    public Camera cam;
+    [SerializeField] private Camera cam;
 
-    public NavMeshAgent agent;
+    [SerializeField] private NavMeshAgent agent;
 
-    public ThirdPersonCharacter character;
+    [SerializeField] private ThirdPersonCharacter character;
 
     public GameObject target;
 
