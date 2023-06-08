@@ -5,22 +5,29 @@ using UnityStandardAssets.Characters.ThirdPerson;
 public class PlayerController : MonoBehaviour
 {
 
-    [SerializeField] private Camera cam;
+    [SerializeField] private Camera _cam;
 
-    [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private NavMeshAgent _agent;
 
-    [SerializeField] private ThirdPersonCharacter character;
+    [SerializeField] private ThirdPersonCharacter _character;
 
-    public GameObject target;
+    [SerializeField] private Vector3 _target;
+
+
+    
 
     void Start()
     {
-        agent.updateRotation = false;
+        //Subscribe
+        GameManager.Instance.OnGetNewTarget += GM_OnGetNewTarget;
 
-        if (target != null)
-        {
-            agent.SetDestination(target.transform.position);
-        }
+        //Setup
+        _agent.updateRotation = false;
+
+        //if (target != null)
+        //{
+        //    agent.SetDestination(target.transform.position);
+        //}
     }
 
     // Update is called once per frame
@@ -29,23 +36,39 @@ public class PlayerController : MonoBehaviour
         
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
-                agent.SetDestination(hit.point);
+                _agent.SetDestination(hit.point);
             }
         }
 
-        if (agent.remainingDistance > agent.stoppingDistance)
+        if (_agent.remainingDistance > _agent.stoppingDistance)
         {
-            character.Move(agent.desiredVelocity, false, false);
+            _character.Move(_agent.desiredVelocity, false, false);
         }
         else
         {
-            character.Move(Vector3.zero, false, false);
+            _character.Move(Vector3.zero, false, false);
         }
 
+    }
+
+    private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
+    {
+        _agent.SetDestination(e.target);
+        Debug.Log($"PLAYER: Aprove target point {e.target}");
+    }
+
+    private void OnTriggerEnter(Collider trigger)
+    {
+        Debug.Log($"THE PLAYER ENTERED THE TRIGGER ({trigger.gameObject.name} of {trigger.gameObject.transform.parent.name})");
+
+        if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
+        {
+            GameManager.Instance.SetChunk(chunk);
+        }
     }
 }

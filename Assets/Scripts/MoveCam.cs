@@ -21,8 +21,11 @@ public class MoveCam : MonoBehaviour
 
     private void Update()
     {
-        _distanceBetweenPointsNormalized = Vector3.Distance(_enterPointDirection, transform.position) / _distanceBetweenPoints;
-        Debug.Log("distance N: " + _distanceBetweenPointsNormalized);
+        if (_currentChunk != null)
+        {
+            _distanceBetweenPointsNormalized = Vector3.Distance(_enterPointDirection, transform.position) / _distanceBetweenPoints;
+            //Debug.Log("distance N: " + _distanceBetweenPointsNormalized + " of " + _currentChunk.transform.parent.name);
+        }
     }
     void LateUpdate()
     {
@@ -34,19 +37,22 @@ public class MoveCam : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log("cam found a some trigger");
         var chunk = other.GetComponentInParent<ChunkHandler>();
-        if (chunk != null)
+        if (chunk != null && _currentChunk != chunk)
         {
-            //Debug.Log("cam found a chunk enter trigger");
+            //Debug.Log(other.transform.parent.name + " collided");
+
             _currentChunk = chunk;
 
             _enterPointDirection = _currentChunk.enter.transform.forward;
             _exitPointDirection = _currentChunk.exit.transform.forward;
 
-            _distanceBetweenPoints = Vector3.Distance(
-                _currentChunk.enter.transform.position, _currentChunk.enter.transform.position);
-            Debug.Log("distance: " + _distanceBetweenPoints);
+            var pos1 = _currentChunk.enter.transform.position;
+            var pos2 = _currentChunk.exit.transform.position;
+
+            _distanceBetweenPoints = Vector3.Distance(pos1, pos2);
+
+            //Debug.Log("distance: " + _distanceBetweenPoints);
         }
     }
 }
