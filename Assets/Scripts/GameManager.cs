@@ -60,17 +60,57 @@ public class GameManager : MonoBehaviour
         if (nextChunk != null)
         {
             //bake new NavMeshSurface
-            _NMS.BuildNavMesh();
+            //_NMS.BuildNavMesh();
+            StartCoroutine(BuildNavMesh(_NMS));
 
             //get next chunk data
             //var target = nextChunk.player_target_point.position;
+            //var target = nextChunk.player_start_point.position;
+            //Debug.Log($"GAME MANAGER: New target point ({target})");
+
+            //OnGetNewTarget?.Invoke(this, new OnGetNewTargetEventArgs
+            //{
+            //    target = target
+            //}); 
+        }
+
+        // called by startcoroutine whenever you want to build the navmesh
+        IEnumerator BuildNavMesh(NavMeshSurface surface)
+        {
+            surface.RemoveData();
+            // get the data for the surface
+            var data = InitializeBakeData(surface);
+
+            // start building the navmesh
+            var async = surface.UpdateNavMesh(data);
+
+            // wait until the navmesh has finished baking
+            yield return async;
+
+            Debug.Log("NavMesh baking (updating) is finished");
+
+            // you need to save the baked data back into the surface
+            surface.navMeshData = data;
+
+            // call AddData() to finalize it
+            surface.AddData();
+
             var target = nextChunk.player_start_point.position;
             Debug.Log($"GAME MANAGER: New target point ({target})");
 
             OnGetNewTarget?.Invoke(this, new OnGetNewTargetEventArgs
             {
                 target = target
-            }); 
+            });
+        }
+
+        // creates the navmesh data
+        static NavMeshData InitializeBakeData(NavMeshSurface surface)
+        {
+            var emptySources = new List<NavMeshBuildSource>();
+            var emptyBounds = new Bounds();
+
+            return UnityEngine.AI.NavMeshBuilder.BuildNavMeshData(surface.GetBuildSettings(), emptySources, emptyBounds, surface.transform.position, surface.transform.rotation);
         }
     }
 
