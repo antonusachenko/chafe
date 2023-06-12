@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Vector3 _target;
 
-
+    private bool _navMeshReady;
     
 
     void Start()
@@ -33,31 +33,35 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (Input.GetMouseButtonDown(0))
+        if (_navMeshReady)
         {
-            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            if (Input.GetMouseButtonDown(0))
             {
-                _agent.SetDestination(hit.point);
+                Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    _agent.SetDestination(hit.point);
+                }
+            }
+
+            if (_agent.remainingDistance > _agent.stoppingDistance)
+            {
+                _character.Move(_agent.desiredVelocity, false, false);
+            }
+            else
+            {
+                _character.Move(Vector3.zero, false, false);
             }
         }
-
-        if (_agent.remainingDistance > _agent.stoppingDistance)
-        {
-            _character.Move(_agent.desiredVelocity, false, false);
-        }
-        else
-        {
-            _character.Move(Vector3.zero, false, false);
-        }
-
     }
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
     {
+        if (!_navMeshReady)
+            _navMeshReady = true;
+
         _agent.SetDestination(e.target);
         Debug.Log($"PLAYER: Aprove target point {e.target}");
     }

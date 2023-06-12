@@ -16,7 +16,7 @@ public class ChunkHandler: MonoBehaviour
     public Transform player_start_point;
     public Transform player_target_point;
 
-
+#if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
         float thickness = 5f;
@@ -27,5 +27,6 @@ public class ChunkHandler: MonoBehaviour
         Handles.color = Color.blue;
         Handles.DrawLine(exit.transform.position, exit.transform.position + exit.forward * length, thickness);
     }
+#endif
 
 }

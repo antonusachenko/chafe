@@ -77,7 +77,6 @@ public class GameManager : MonoBehaviour
         // called by startcoroutine whenever you want to build the navmesh
         IEnumerator BuildNavMesh(NavMeshSurface surface)
         {
-            surface.RemoveData();
             // get the data for the surface
             var data = InitializeBakeData(surface);
 
@@ -88,6 +87,8 @@ public class GameManager : MonoBehaviour
             yield return async;
 
             Debug.Log("NavMesh baking (updating) is finished");
+
+            surface.RemoveData();
 
             // you need to save the baked data back into the surface
             surface.navMeshData = data;

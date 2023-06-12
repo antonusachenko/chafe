@@ -471,6 +471,16 @@ PrefabInstance:
       propertyPath: _character
       value: 
       objectReference: {fileID: 5414470208758497809}
+    - target: {fileID: 5414470209519089889, guid: c49ec56e0ad8bc24fa27bd8daf1c4b71,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5414470209519089889, guid: c49ec56e0ad8bc24fa27bd8daf1c4b71,
+        type: 3}
+      propertyPath: IgroreProjectOnPlane
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5414470209519089891, guid: c49ec56e0ad8bc24fa27bd8daf1c4b71,
         type: 3}
       propertyPath: m_Name
