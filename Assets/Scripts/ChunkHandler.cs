@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 public class ChunkHandler: MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class ChunkHandler: MonoBehaviour
     public Transform player_start_point;
     public Transform player_target_point;
 
+    public NavMeshSurface navMeshSurface;
+    public NavMeshData navMeshData;
+
 #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
@@ -26,6 +30,11 @@ public class ChunkHandler: MonoBehaviour
 
         Handles.color = Color.blue;
         Handles.DrawLine(exit.transform.position, exit.transform.position + exit.forward * length, thickness);
+    }
+
+    public void SelfDestroy()
+    {
+        Destroy(this.gameObject);
     }
 #endif
 

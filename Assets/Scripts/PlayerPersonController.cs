@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Vector3 _target;
 
-    private bool _navMeshReady;
+    //private bool _navMeshReady;
     
 
     void Start()
@@ -24,43 +24,37 @@ public class PlayerController : MonoBehaviour
         //Setup
         _agent.updateRotation = false;
 
-        //if (target != null)
-        //{
-        //    agent.SetDestination(target.transform.position);
-        //}
+        //Start run
+        _agent.SetDestination(_target);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (_navMeshReady)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
+            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-                if (Physics.Raycast(ray, out hit))
-                {
-                    _agent.SetDestination(hit.point);
-                }
+            if (Physics.Raycast(ray, out hit))
+            {
+                _agent.SetDestination(hit.point);
             }
+        }
 
-            if (_agent.remainingDistance > _agent.stoppingDistance)
-            {
-                _character.Move(_agent.desiredVelocity, false, false);
-            }
-            else
-            {
-                _character.Move(Vector3.zero, false, false);
-            }
+        if (_agent.remainingDistance > _agent.stoppingDistance)
+        {
+            _character.Move(_agent.desiredVelocity, false, false);
+        }
+        else
+        {
+            _character.Move(Vector3.zero, false, false);
         }
     }
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
     {
-        if (!_navMeshReady)
-            _navMeshReady = true;
+        //if (!_navMeshReady)
+        //    _navMeshReady = true;
 
         _agent.SetDestination(e.target);
         Debug.Log($"PLAYER: Aprove target point {e.target}");
@@ -72,7 +66,7 @@ public class PlayerController : MonoBehaviour
 
         if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
         {
-            GameManager.Instance.SetChunk(chunk);
+            GameManager.Instance.EnteredTheChunk(chunk);
         }
     }
 }

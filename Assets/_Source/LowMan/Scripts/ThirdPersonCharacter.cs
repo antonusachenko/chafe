@@ -54,9 +54,11 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			if (move.magnitude > 1f) move.Normalize();
 			move = transform.InverseTransformDirection(move);
 			CheckGroundStatus();
+
 			// extra option
 			if (!IgroreProjectOnPlane)
                 move = Vector3.ProjectOnPlane(move, m_GroundNormal);
+
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
 			m_ForwardAmount = move.z;
 
