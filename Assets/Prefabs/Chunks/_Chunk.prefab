@@ -91,6 +91,8 @@ MonoBehaviour:
   obstacle_spawners: []
   player_start_point: {fileID: 3013201436527469000}
   player_target_point: {fileID: 1601135098374884692}
+  navMeshSurface: {fileID: 3688744142594008585}
+  navMeshData: {fileID: 23800000, guid: 66e675f9e33f64c47a9216e6b5717c35, type: 2}
 --- !u!1 &791765633915587266
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,7 +209,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
-  m_GenerateLinks: 0
+  m_GenerateLinks: 1
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
@@ -467,6 +469,8 @@ MonoBehaviour:
   obstacle_spawners: []
   player_start_point: {fileID: 3013201436527469000}
   player_target_point: {fileID: 1601135098374884692}
+  navMeshSurface: {fileID: 0}
+  navMeshData: {fileID: 0}
 --- !u!1 &6325153209312970230
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,8 +554,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 15, y: 1, z: 10.6876955}
-  m_Center: {x: 0, y: 0, z: 3.8438478}
+  m_Size: {x: 15, y: 1, z: 2.26685}
+  m_Center: {x: 0, y: 0, z: 1.9850006}
 --- !u!1 &8279960464212214878
 GameObject:
   m_ObjectHideFlags: 0

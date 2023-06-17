@@ -14,7 +14,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector3 _target;
 
     //private bool _navMeshReady;
-    
+
+
+    private void Awake()
+    {
+        _agent.enabled = false;
+    }
 
     void Start()
     {
@@ -25,12 +30,17 @@ public class PlayerController : MonoBehaviour
         _agent.updateRotation = false;
 
         //Start run
-        _agent.SetDestination(_target);
+        
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!_agent.isActiveAndEnabled)
+        {
+            _character.Move(new Vector3(0f, 0f, 1f), false, false);
+        }
+
+        if (_agent.isActiveAndEnabled && Input.GetMouseButtonDown(0))
         {
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -41,7 +51,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (_agent.remainingDistance > _agent.stoppingDistance)
+        if (_agent.isActiveAndEnabled && _agent.remainingDistance > _agent.stoppingDistance)
         {
             _character.Move(_agent.desiredVelocity, false, false);
         }
@@ -53,9 +63,6 @@ public class PlayerController : MonoBehaviour
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
     {
-        //if (!_navMeshReady)
-        //    _navMeshReady = true;
-
         _agent.SetDestination(e.target);
         Debug.Log($"PLAYER: Aprove target point {e.target}");
     }
@@ -66,6 +73,8 @@ public class PlayerController : MonoBehaviour
 
         if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
         {
+            _agent.enabled = true;
+            Debug.Log($"PLAYER: NavMesh Agent was enabled");
             GameManager.Instance.EnteredTheChunk(chunk);
         }
     }

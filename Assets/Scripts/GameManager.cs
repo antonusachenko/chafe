@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ChunkHandler _currentChunk;
     [SerializeField] private ChunkHandler[] _chunkList;
 
-    private List<ChunkHandler> _spawnedChunks;
+    private List<ChunkHandler> _spawnedChunks = new List<ChunkHandler>();
 
     private Transform _newEnterPoint;
 
@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
     {
         GameManager.Instance.OnCurrentChunkUpdated += OnCurrentChunkUpdated_BuildNewChunk;
         //spawn first chunk
+        // --code--
     }
 
     private void OnCurrentChunkUpdated_BuildNewChunk(object sender, EventArgs e)
@@ -67,12 +68,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"GAME MANAGER: New chunk was generate, it's named ({nextChunk.gameObject.name})");
 
-        var data = InitializeBakeData(_navMeshSurface);
-        //Get NavMesh data from all chunks
-        for (int i=0; i < _spawnedChunks.Count; i++)
-        {
-
-        }
+        
         
     }
 
@@ -97,13 +93,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    static NavMeshData InitializeBakeData(NavMeshSurface surface)
-    {
-        var emptySources = new List<NavMeshBuildSource>();
-        var emptyBounds = new Bounds();
-
-        return UnityEngine.AI.NavMeshBuilder.BuildNavMeshData(surface.GetBuildSettings(), emptySources, emptyBounds, surface.transform.position, surface.transform.rotation);
-    }
 }
 
 
