@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
 
     private bool _analogCharacterControlEnabled;
 
+    private bool _agentDestinationCorrect;
+
 
     private void Awake()
     {
@@ -56,7 +58,7 @@ public class PlayerController : MonoBehaviour
                 //destination was get
                 Debug.Log($"PLAYER: Destination was get !!!");
                 EnableAnalogCharacterControl();
-                characterDirection = (this.transform.position - _analogTarget).normalized;
+                characterDirection = (_analogTarget - transform.position).normalized;
             }
 
             //click control
@@ -99,10 +101,24 @@ public class PlayerController : MonoBehaviour
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
     {
-        _agent.SetDestination(e.chunkTarget);
+        SetAgentDestination(e.chunkTarget);
         _analogTarget = e.analogTarget;
-        EnableNavMeshCharacterControl();
-        Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
+
+        //Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
+    }
+
+    private void SetAgentDestination(Vector3 target)
+    {
+        _agentDestinationCorrect = _agent.SetDestination(target);
+        if (_agentDestinationCorrect)
+        {
+            EnableNavMeshCharacterControl();
+            Debug.Log($"PLAYER: Aprove chunk target point {target} ");
+        }
+        else
+        {
+            //SetAgentDestination(target);
+        }
     }
 
     private void OnTriggerEnter(Collider trigger)
@@ -111,6 +127,7 @@ public class PlayerController : MonoBehaviour
 
         if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
         {
+            EnableNavMeshCharacterControl();
             GameManager.Instance.EnteredTheChunk(chunk);
         }
     }
