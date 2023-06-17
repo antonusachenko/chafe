@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
 
     public class OnGetNewTargetEventArgs : EventArgs
     {
-        public Vector3 target;
+        public Vector3 chunkTarget;
+        public Vector3 analogTarget;
     }
 
     [SerializeField] private bool GENERATE_NEW_NMDATA;
@@ -53,12 +54,13 @@ public class GameManager : MonoBehaviour
         //Get enter point
         _newEnterPoint = _currentChunk.exit.transform;
 
-        //Try to spawn new chunk
+        //Spawn new chunk
         var randomChunk = _chunkList[UnityEngine.Random.Range(0, _chunkList.Length)];
         var nextChunk = Instantiate(randomChunk, _newEnterPoint);
         nextChunk.transform.SetParent(null);
         if(_spawnedChunks.Count >= 3){
             _spawnedChunks.First().SelfDestroy();
+            _spawnedChunks.RemoveAt(0);
             _spawnedChunks.Add(nextChunk);
         }
         else
@@ -68,19 +70,15 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"GAME MANAGER: New chunk was generate, it's named ({nextChunk.gameObject.name})");
 
-        
-        
-    }
+        //Call event to send targets
+        var analogTarget = nextChunk.player_start_point.position;
+        var chunkTarget = _currentChunk.player_target_point.position;
+        OnGetNewTarget?.Invoke(this, new OnGetNewTargetEventArgs
+        {
+            chunkTarget = chunkTarget,
+            analogTarget = analogTarget,
+        });
 
-    private void AddNavMeshData(NavMeshSurface surface, NavMeshData newData)
-    {
-        //_navMeshDataInstance = NavMesh.AddNavMeshData(newData);
-        //surface.navMeshData = _navMeshDataInstance;
-    }
-
-    private NavMeshData GetNavMeshDataFromPrefab(ChunkHandler chunk)
-    {
-        return chunk.navMeshSurface.navMeshData;
     }
 
     public void EnteredTheChunk(ChunkHandler newChunk)

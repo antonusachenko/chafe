@@ -13,12 +13,17 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Vector3 _target;
 
-    //private bool _navMeshReady;
+    public Vector3 characterDirection;
+
+    private Vector3 _analogTarget;
+
+    private bool _analogCharacterControlEnabled;
 
 
     private void Awake()
     {
-        _agent.enabled = false;
+        EnableAnalogCharacterControl();
+        characterDirection = new Vector3(0, 0, 5f);
     }
 
     void Start()
@@ -28,43 +33,76 @@ public class PlayerController : MonoBehaviour
 
         //Setup
         _agent.updateRotation = false;
-
-        //Start run
-        
     }
 
     void Update()
     {
-        if (!_agent.isActiveAndEnabled)
+        if (_analogCharacterControlEnabled)
         {
-            _character.Move(new Vector3(0f, 0f, 1f), false, false);
+            //moving by direction
+            _character.Move(characterDirection, false, false);
         }
-
-        if (_agent.isActiveAndEnabled && Input.GetMouseButtonDown(0))
+        else if(_agent.isActiveAndEnabled)
         {
-            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+            Debug.Log($"PLAYER: _agent.remainingDistance {_agent.remainingDistance}");
 
-            if (Physics.Raycast(ray, out hit))
+            //moving by navmesh
+            if (_agent.remainingDistance > _agent.stoppingDistance)
             {
-                _agent.SetDestination(hit.point);
+                _character.Move(_agent.desiredVelocity, false, false);
             }
-        }
+            else
+            {
+                //destination was get
+                Debug.Log($"PLAYER: Destination was get !!!");
+                EnableAnalogCharacterControl();
+                characterDirection = (this.transform.position - _analogTarget).normalized;
+            }
 
-        if (_agent.isActiveAndEnabled && _agent.remainingDistance > _agent.stoppingDistance)
-        {
-            _character.Move(_agent.desiredVelocity, false, false);
+            //click control
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    _agent.SetDestination(hit.point);
+                }
+            }
         }
         else
         {
             _character.Move(Vector3.zero, false, false);
         }
+
+        //if (Input.GetMouseButtonDown(0) && !_analogCharacterControlEnabled )
+        //{
+        //    Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+        //    RaycastHit hit;
+
+        //    if (Physics.Raycast(ray, out hit))
+        //    {
+        //        _agent.SetDestination(hit.point);
+        //    }
+        //}
+
+        //if (!_analogCharacterControlEnabled && _agent.remainingDistance > _agent.stoppingDistance)
+        //{
+        //    _character.Move(_agent.desiredVelocity, false, false);
+        //}
+        //else
+        //{
+        //    _character.Move(Vector3.zero, false, false);
+        //}
     }
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
     {
-        _agent.SetDestination(e.target);
-        Debug.Log($"PLAYER: Aprove target point {e.target}");
+        _agent.SetDestination(e.chunkTarget);
+        _analogTarget = e.analogTarget;
+        EnableNavMeshCharacterControl();
+        Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
     }
 
     private void OnTriggerEnter(Collider trigger)
@@ -73,9 +111,23 @@ public class PlayerController : MonoBehaviour
 
         if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
         {
-            _agent.enabled = true;
-            Debug.Log($"PLAYER: NavMesh Agent was enabled");
             GameManager.Instance.EnteredTheChunk(chunk);
         }
+    }
+
+    private void EnableAnalogCharacterControl()
+    {
+
+        Debug.Log($"PLAYER: NavMesh Agent was disabled");
+        _analogCharacterControlEnabled = true;
+        _agent.enabled = false;
+    }
+
+    private void EnableNavMeshCharacterControl()
+    {
+
+        Debug.Log($"PLAYER: NavMesh Agent was enabled");
+        _analogCharacterControlEnabled = false;
+        _agent.enabled = true;
     }
 }
