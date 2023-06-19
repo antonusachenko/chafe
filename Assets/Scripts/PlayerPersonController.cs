@@ -41,62 +41,28 @@ public class PlayerController : MonoBehaviour
     {
         if (_analogCharacterControlEnabled)
         {
-            //moving by direction
-            _character.Move(characterDirection, false, false);
+            _character.Move(new Vector3(0f, 0f, 1f), false, false);
         }
-        else if(_agent.isActiveAndEnabled)
+
+        if (!_analogCharacterControlEnabled && Input.GetMouseButtonDown(0))
         {
-            Debug.Log($"PLAYER: _agent.remainingDistance {_agent.remainingDistance}");
+            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-            //moving by navmesh
-            if (_agent.remainingDistance > _agent.stoppingDistance)
+            if (Physics.Raycast(ray, out hit))
             {
-                _character.Move(_agent.desiredVelocity, false, false);
+                _agent.SetDestination(hit.point);
             }
-            else
-            {
-                //destination was get
-                Debug.Log($"PLAYER: Destination was get !!!");
-                EnableAnalogCharacterControl();
-                characterDirection = (_analogTarget - transform.position).normalized;
-            }
+        }
 
-            //click control
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-
-                if (Physics.Raycast(ray, out hit))
-                {
-                    _agent.SetDestination(hit.point);
-                }
-            }
+        if (!_analogCharacterControlEnabled && _agent.remainingDistance > _agent.stoppingDistance)
+        {
+            _character.Move(_agent.desiredVelocity, false, false);
         }
         else
         {
             _character.Move(Vector3.zero, false, false);
         }
-
-        //if (Input.GetMouseButtonDown(0) && !_analogCharacterControlEnabled )
-        //{
-        //    Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-        //    RaycastHit hit;
-
-        //    if (Physics.Raycast(ray, out hit))
-        //    {
-        //        _agent.SetDestination(hit.point);
-        //    }
-        //}
-
-        //if (!_analogCharacterControlEnabled && _agent.remainingDistance > _agent.stoppingDistance)
-        //{
-        //    _character.Move(_agent.desiredVelocity, false, false);
-        //}
-        //else
-        //{
-        //    _character.Move(Vector3.zero, false, false);
-        //}
     }
 
     private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
