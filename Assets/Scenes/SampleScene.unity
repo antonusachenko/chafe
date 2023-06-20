@@ -586,7 +586,7 @@ PrefabInstance:
     - target: {fileID: 5414470209519089889, guid: c49ec56e0ad8bc24fa27bd8daf1c4b71,
         type: 3}
       propertyPath: IgroreProjectOnPlane
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5414470209519089891, guid: c49ec56e0ad8bc24fa27bd8daf1c4b71,
         type: 3}
