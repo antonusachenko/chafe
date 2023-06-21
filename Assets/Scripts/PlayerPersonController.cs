@@ -16,20 +16,15 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private Vector3 _target;
 
-    [SerializeField] private float _stopTime = 2f;
+    [SerializeField] private float _timerToSwitch4AnalogRun = 1f;
 
     public Vector3 characterDirection;
 
     private Vector3 _navmeshTarget;
     private Vector3 _analogTarget;
 
-    private bool _isTargetPointReached;
-
-    private bool _analogCharacterControlEnabled;
-
     private bool _agentDestinationCorrect;
 
-    private float _timerToSwitch4AnalogRun;
 
 
     private void Awake()
@@ -50,20 +45,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
         switch (state)
         {
             case PlayerState.ANALOG_RUN:
                 //code
                 Debug.Log($"PLAYER: ANALOG_RUN ");
-                _agent.velocity = Vector3.zero;
-                _agent.enabled = false;
+                
                 _character.Move(characterDirection, false, false);
 
                 break;
 
             case PlayerState.NM_RUN:
                 //code
-                //Debug.Log($"PLAYER: _agent.remainingDistance {_agent.remainingDistance} ");
                 Debug.Log($"PLAYER: NM_RUN ");
 
                 // click control
@@ -86,11 +80,12 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     _character.Move(Vector3.zero, false, false);
-                    //_character.Move(_agent.desiredVelocity, false, false);
-                    //_agent.enabled = false; //agent needed time to stop
-                    if (_agent.velocity.magnitude < 0.01f)
-                        _agent.isStopped = true;
+
+                    if (_agent.velocity.magnitude < _timerToSwitch4AnalogRun)
+                    {
                         state = PlayerState.NMRUN_REACHED;
+                        _agent.enabled = false;
+                    }
                 }
 
                 break;
@@ -98,8 +93,8 @@ public class PlayerController : MonoBehaviour
             case PlayerState.WAITING4PATH:
                 //code
                 Debug.Log($"PLAYER: WAITING4PATH ");
-                _character.Move(Vector3.zero, false, false);
-                if (_agent.isActiveAndEnabled && _agentDestinationCorrect && _agent.remainingDistance != null)
+
+                if (_agent.isActiveAndEnabled && _agentDestinationCorrect)
                 {
                     state = PlayerState.NM_RUN;
                 }
@@ -108,22 +103,10 @@ public class PlayerController : MonoBehaviour
 
             case PlayerState.NMRUN_REACHED:
                 //code
-                //_character.Move(Vector3.zero, false, false);
-
                 Debug.Log($"PLAYER: NMRUN_REACHED ");
+
                 characterDirection = (_analogTarget - transform.position).normalized;
-
-                //if (_timerToSwitch4AnalogRun > 0)
-                //{
-                //    _timerToSwitch4AnalogRun -= Time.deltaTime;
-                //}
-                //else
-                //{
-                //    state = PlayerState.ANALOG_RUN;
-                //}
-
-                if(_agent.velocity.magnitude < 0.01f)
-                    state = PlayerState.ANALOG_RUN;
+                state = PlayerState.ANALOG_RUN;
 
                 break;
 
@@ -134,7 +117,7 @@ public class PlayerController : MonoBehaviour
             default:
                 //code
                 _character.Move(Vector3.zero, false, false);
-                Debug.LogWarning($"PLAYER: WAITING FOR PATH ");
+                Debug.LogWarning($"PLAYER: default state ? ");
                 break;
         }
 

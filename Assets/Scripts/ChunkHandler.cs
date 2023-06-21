@@ -31,11 +31,10 @@ public class ChunkHandler: MonoBehaviour
         Handles.color = Color.blue;
         Handles.DrawLine(exit.transform.position, exit.transform.position + exit.forward * length, thickness);
     }
+#endif
 
     public void SelfDestroy()
     {
         Destroy(this.gameObject);
     }
-#endif
-
 }

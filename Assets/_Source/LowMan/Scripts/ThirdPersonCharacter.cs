@@ -59,6 +59,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			if (!IgroreProjectOnPlane)
                 move = Vector3.ProjectOnPlane(move, m_GroundNormal);
 
+			//debug
+			if (move.y > 0.5f)
+				Debug.LogError("suka");
+
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
 			m_ForwardAmount = move.z;
 
