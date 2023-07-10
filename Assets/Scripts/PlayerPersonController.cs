@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
@@ -6,11 +7,15 @@ using static UnityEngine.GraphicsBuffer;
 public class PlayerController : MonoBehaviour
 {
     public enum PlayerState { ANALOG_RUN, NM_RUN, WAITING4PATH, NMRUN_REACHED, DEATH };
-    public PlayerState state;
+    [HideInInspector] public PlayerState state;
+
+    [Header("Links")]
 
     [SerializeField] private Camera _cam;
 
     [SerializeField] private NavMeshAgent _agent;
+
+    [Header("Movement")]
 
     [SerializeField] private ThirdPersonCharacter _character;
 
@@ -24,6 +29,12 @@ public class PlayerController : MonoBehaviour
     private Vector3 _analogTarget;
 
     private bool _agentDestinationCorrect;
+
+    [Header("Health")]
+
+    [SerializeField] private float _hp;
+
+    private float test_timer;
 
 
 
@@ -41,17 +52,61 @@ public class PlayerController : MonoBehaviour
         //Setup
         _agent.updateRotation = false;
         state = PlayerState.ANALOG_RUN;
+
+        _hp = 100;
     }
 
     void Update()
     {
+        StateUpdate();
 
+        test_timer -= Time.deltaTime;
+        if (test_timer < 0)
+        {
+            test_timer = 2f;
+            this.SetDamage(5);
+            GameManager.Instance.PlayerHPChanged(_hp); //test
+        }
+
+    }
+
+
+    private void OnTriggerEnter(Collider trigger)
+    {
+        Debug.Log($"THE PLAYER ENTERED THE TRIGGER ({trigger.gameObject.name} of {trigger.gameObject.transform.parent.name})");
+
+        if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
+        {
+            GameManager.Instance.EnteredTheChunk(chunk);
+        }
+    }
+    private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
+    {
+        _navmeshTarget = e.chunkTarget;
+        _analogTarget = e.analogTarget;
+        _agent.enabled = true;
+        _agentDestinationCorrect = _agent.SetDestination(_navmeshTarget);
+        if (_agentDestinationCorrect)
+        {
+            state = PlayerState.WAITING4PATH;
+            Debug.Log($"PLAYER: Aprove chunk target point {_navmeshTarget} ");
+        }
+        else
+        {
+            Debug.LogError($"PLAYER: NAVMESH TARGET SET FAILED");
+        }
+
+        //Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
+    }
+
+    private void StateUpdate()
+    {
         switch (state)
         {
             case PlayerState.ANALOG_RUN:
                 //code
                 Debug.Log($"PLAYER: ANALOG_RUN ");
-                
+
                 _character.Move(characterDirection, false, false);
 
                 break;
@@ -120,39 +175,22 @@ public class PlayerController : MonoBehaviour
                 Debug.LogWarning($"PLAYER: default state ? ");
                 break;
         }
-
-
-
-        
     }
 
-    private void GM_OnGetNewTarget(object sender, GameManager.OnGetNewTargetEventArgs e)
+    public void SetDamage(float value)
     {
-        _navmeshTarget = e.chunkTarget;
-        _analogTarget = e.analogTarget;
-        _agent.enabled = true;
-        _agentDestinationCorrect = _agent.SetDestination(_navmeshTarget);
-        if (_agentDestinationCorrect)
+        if (value > 0)
         {
-            state = PlayerState.WAITING4PATH;
-            Debug.Log($"PLAYER: Aprove chunk target point {_navmeshTarget} ");
-        }
-        else
-        {
-            Debug.LogError($"PLAYER: NAVMESH TARGET SET FAILED");
-        }
+            _hp -= value;
 
-        //Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
+            if (_hp < 0)
+                _hp = 0;
+        }
     }
 
-    private void OnTriggerEnter(Collider trigger)
+    public float GetHP()
     {
-        Debug.Log($"THE PLAYER ENTERED THE TRIGGER ({trigger.gameObject.name} of {trigger.gameObject.transform.parent.name})");
-
-        if (trigger.transform.parent.TryGetComponent(out ChunkHandler chunk))
-        {
-            GameManager.Instance.EnteredTheChunk(chunk);
-        }
+        return _hp;
     }
 
 }

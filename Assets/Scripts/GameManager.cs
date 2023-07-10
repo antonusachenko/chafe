@@ -17,6 +17,12 @@ public class GameManager : MonoBehaviour
         public ChunkHandler chunk;
     }
 
+    public event EventHandler<OnPlayerHPUpdatedEventArgs> OnPlayerHPUpdated;
+    public class OnPlayerHPUpdatedEventArgs : EventArgs
+    {
+        public float hp;
+    }
+
     public event EventHandler<OnGetNewTargetEventArgs> OnGetNewTarget;
 
     public class OnGetNewTargetEventArgs : EventArgs
@@ -91,6 +97,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void PlayerHPChanged(float hp)
+    {
+        OnPlayerHPUpdated?.Invoke(this, new OnPlayerHPUpdatedEventArgs
+        {
+            hp = hp,
+        });
+    }
 }
 
 
