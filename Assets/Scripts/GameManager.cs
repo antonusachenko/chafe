@@ -51,8 +51,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnCurrentChunkUpdated += OnCurrentChunkUpdated_BuildNewChunk;
+
         //spawn first chunk
-        // --code--
+        SpawnNewChunk(true);
     }
 
     private void OnCurrentChunkUpdated_BuildNewChunk(object sender, EventArgs e)
@@ -61,10 +62,16 @@ public class GameManager : MonoBehaviour
         _newEnterPoint = _currentChunk.exit.transform;
 
         //Spawn new chunk
+        SpawnNewChunk();
+    }
+
+    private ChunkHandler SpawnNewChunk(bool first = false)
+    {
         var randomChunk = _chunkList[UnityEngine.Random.Range(0, _chunkList.Length)];
         var nextChunk = Instantiate(randomChunk, _newEnterPoint);
         nextChunk.transform.SetParent(null);
-        if(_spawnedChunks.Count >= 3){
+        if (_spawnedChunks.Count >= 3)
+        {
             _spawnedChunks.First().SelfDestroy();
             _spawnedChunks.RemoveAt(0);
             _spawnedChunks.Add(nextChunk);
@@ -76,15 +83,19 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"GAME MANAGER: New chunk was generate, it's named ({nextChunk.gameObject.name})");
 
-        //Call event to send targets
-        var analogTarget = nextChunk.player_start_point.position;
-        var chunkTarget = _currentChunk.player_target_point.position;
-        OnGetNewTarget?.Invoke(this, new OnGetNewTargetEventArgs
+        if (!first) 
         {
-            chunkTarget = chunkTarget,
-            analogTarget = analogTarget,
-        });
+            //Call event to send targets
+            var analogTarget = nextChunk.player_start_point.position;
+            var chunkTarget = _currentChunk.player_target_point.position;
+            OnGetNewTarget?.Invoke(this, new OnGetNewTargetEventArgs
+            {
+                chunkTarget = chunkTarget,
+                analogTarget = analogTarget,
+            });
+        }
 
+        return nextChunk;
     }
 
     public void EnteredTheChunk(ChunkHandler newChunk)

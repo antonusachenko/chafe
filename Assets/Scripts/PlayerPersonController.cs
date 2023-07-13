@@ -34,8 +34,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float _hp;
 
-    private float test_timer;
-
 
 
     private void Awake()
@@ -59,14 +57,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         StateUpdate();
-
-        test_timer -= Time.deltaTime;
-        if (test_timer < 0)
-        {
-            test_timer = 2f;
-            this.SetDamage(5);
-            GameManager.Instance.PlayerHPChanged(_hp); //test
-        }
 
     }
 
