@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float _timerToSwitch4AnalogRun = 1f;
 
-    public Vector3 characterDirection;
+    private Vector3 characterDirection;
 
     private Vector3 _navmeshTarget;
     private Vector3 _analogTarget;
@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"PLAYER: NAVMESH TARGET SET FAILED");
+            Debug.LogError($"PLAYER: NAVMESH DESTINATION IS UNCORRECT");
         }
 
         //Debug.Log($"PLAYER: Aprove chunk target point {e.chunkTarget} and next target point {e.analogTarget}");
@@ -142,6 +142,10 @@ public class PlayerController : MonoBehaviour
                 if (_agent.isActiveAndEnabled && _agentDestinationCorrect)
                 {
                     state = PlayerState.NM_RUN;
+                }
+                else
+                {
+                    Debug.LogError($"PLAYER: NAVMESH DESTINATION IS UNCORRECT");
                 }
 
                 break;
